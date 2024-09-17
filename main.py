@@ -49,51 +49,88 @@ def capture_quotes(word, start_index):
     return word
 
 
+def process_word(word, suffix, prepend_quote=False, append_quote=False):
+    if prepend_quote and append_quote:
+        return "\"" + word + suffix + "\""
+    elif prepend_quote and not append_quote:
+        return "\"" + word + suffix
+    elif append_quote and not prepend_quote:
+        return word + suffix + "\""
+    else:
+        return word + suffix
+
+
 def get_pig_latin_word(word):
     """Format given word in pig latin, taking punctuation into account"""
 
-    # TODO: Implement quote handling
-    # start_index = word.find('\"')
-    #
-    # if start_index != -1:
-    #     word, end_index = capture_quotes(word, start_index)
+    # Preprocessing
 
+    # Handle double quotes
+    start_index = word.find('\"')
+
+    append_quote = False
+    prepend_quote = False
+
+    if start_index != -1:
+        end_index = word.find('\"', start_index + 1)
+        if start_index == 0:
+            prepend_quote = True
+        if end_index != -1 or start_index == word.find(word[-1]):
+            append_quote = True
+        word = word.strip('\"')
+
+    # Set needed variables
     last_char_in_word = word[-1]
+
+    # Boolean determinants
     word_ends_with_punctuation = False
     first_char_upper = False
+    word_upper = False
+
     if last_char_in_word in string.punctuation:
         word_ends_with_punctuation = True
 
-    if word[0].isupper():
+    if word[0].isupper() and not word.isupper():
         first_char_upper = True
 
+    if word.isupper():
+        word_upper = True
+
+    # Data manipulation
     pig_latin_word = ""
     if word_ends_with_punctuation:
         # If the word starts with a vowel and has punctuation, add 'way'
         # and the punctuation to the end of the word.
         if is_vowel(word[0]):
-            pig_latin_word = word[:-1].lower() + f"way{last_char_in_word}"
+            pig_latin_word = process_word(word[:-1].lower(),
+                                          f"way{last_char_in_word}", prepend_quote, append_quote)
+
         elif starts_with_consonant_cluster(word):
-            pig_latin_word = (word[consonant_cluster_size:].lower() +
-                              word[0:consonant_cluster_size].lower() + f"ay{last_char_in_word}")
+            pig_latin_word = process_word(word[consonant_cluster_size:].lower() +
+                                          word[0:consonant_cluster_size].lower(), f"ay{last_char_in_word}",
+                                          prepend_quote, append_quote)
         else:
             # Else add the first letter to the end and append 'ay' if it is a consonant
-            pig_latin_word = word[1:-1].lower() + word[0].lower() + f"ay{last_char_in_word}"
-
+            pig_latin_word = process_word(word[1:-1].lower() + word[0].lower(), f"ay{last_char_in_word}",
+                                          prepend_quote, append_quote)
     else:
         if is_vowel(word[0]):
-            pig_latin_word = word.lower() + f"way"
+            pig_latin_word = process_word(word.lower(), f"way", prepend_quote, append_quote)
         elif starts_with_consonant_cluster(word):
-            pig_latin_word = (word[consonant_cluster_size:].lower() +
-                              word[0:consonant_cluster_size].lower() + f"ay")
+            pig_latin_word = process_word(word[consonant_cluster_size:].lower() +
+                                          word[0:consonant_cluster_size].lower(), f"ay",
+                                          prepend_quote, append_quote)
         else:
             # Else add the first letter to the end and append 'ay' if it is a consonant
-            pig_latin_word = word[1:].lower() + word[0].lower() + f"ay"
+            pig_latin_word = process_word(word[1:].lower() + word[0].lower(), f"ay", prepend_quote, append_quote)
 
     if first_char_upper:
         pig_latin_word = list(pig_latin_word)
         pig_latin_word[0] = pig_latin_word[0].upper()
         pig_latin_word = "".join(pig_latin_word)
+
+    elif word_upper:
+        pig_latin_word = pig_latin_word.upper()
 
     return pig_latin_word
 
@@ -120,7 +157,6 @@ def main():
         try_again = input("\n\nTry again? (Press Enter else n to quit)\n ")
         if try_again.lower() == "n":
             break
-    # capture_quotes("\"relo\"", 0)
 
 
 if __name__ == "__main__":
