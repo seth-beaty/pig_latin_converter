@@ -40,7 +40,7 @@ def starts_with_consonant_cluster(word):
     return False
 
 
-#TODO: Implement quote handling
+# TODO: Implement quote handling
 def capture_quotes(word, start_index):
     end_index = word.find('\"', start_index + 1)
     word = word.strip('\"')
@@ -68,7 +68,6 @@ def get_pig_latin_word(word):
         first_char_upper = True
 
     pig_latin_word = ""
-    print(word)
     if word_ends_with_punctuation:
         # If the word starts with a vowel and has punctuation, add 'way'
         # and the punctuation to the end of the word.
