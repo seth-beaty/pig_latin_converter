@@ -8,5 +8,6 @@ Windows Defender may try to warn you about running the file. You can inspect the
 something harmful may be in it.
 
 TODO:
-- [ ] Be able to process all capital phrases
-- [ ] Be able to process quotes
+- [x] Be able to process all capital phrases
+- [x] Be able to process double quotes
+- [ ] Be able to process single quotes?
