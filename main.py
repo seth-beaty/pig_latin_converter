@@ -9,7 +9,7 @@ consonant_cluster_size = 0
 
 def is_vowel(char):
     vowels = ['a', 'e', 'i', 'o', 'u']
-    if char in vowels:
+    if char.lower() in vowels:
         return True
     return False
 
