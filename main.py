@@ -106,7 +106,7 @@ def get_pig_latin_word(word):
                                           f"way{last_char_in_word}", prepend_quote, append_quote)
 
         elif starts_with_consonant_cluster(word):
-            pig_latin_word = process_word(word[consonant_cluster_size:].lower() +
+            pig_latin_word = process_word(word[consonant_cluster_size:-1].lower() +
                                           word[0:consonant_cluster_size].lower(), f"ay{last_char_in_word}",
                                           prepend_quote, append_quote)
         else:
