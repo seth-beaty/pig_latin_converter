@@ -7,7 +7,6 @@ import pyperclip
 
 def is_vowel(char, word):
     if 'y' in word.lower() and len(word) >= 3 and word[1] == 'y':
-        print("got here", word)
         return char.lower() in 'aeiouy'
     return char.lower() in 'aeiou'
 
