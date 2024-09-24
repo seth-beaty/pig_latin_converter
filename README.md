@@ -10,4 +10,4 @@ something harmful may be in it.
 TODO:
 - [x] Be able to process all capital phrases
 - [x] Be able to process double quotes
-- [ ] Be able to process single quotes?
+- [x] Process the rules around y (consonant and vowel)

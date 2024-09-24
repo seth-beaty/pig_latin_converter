@@ -4,135 +4,69 @@ import string
 import textwrap
 import pyperclip
 
-consonant_cluster_size = 0
 
-
-def is_vowel(char):
-    vowels = ['a', 'e', 'i', 'o', 'u']
-    if char.lower() in vowels:
-        return True
-    return False
-
-
-def set_consonant_cluster_size(consonant_count):
-    global consonant_cluster_size
-    consonant_cluster_size = consonant_count
+def is_vowel(char, word):
+    if 'y' in word.lower() and len(word) >= 3 and word[1] == 'y':
+        print("got here", word)
+        return char.lower() in 'aeiouy'
+    return char.lower() in 'aeiou'
 
 
 def starts_with_consonant_cluster(word):
-    consonant_count = 0
-    index = 0
-    if len(word) > 2:
-        # Check the first 3 letters of the word
-        while index < len(word[:3]):
-            if index > 0:
-                # If the first two letters are consonants, then increment the counter
-                if not is_vowel(word[index]) and not is_vowel(word[index - 1]):
-                    consonant_count += 1
+    word = word.lower()
+    consonant_cluster_size = 0
+    if len(word) >= 2:
+        for i, char in enumerate(word[:3]):
+            if not is_vowel(char, word):
+                consonant_cluster_size += 1
             else:
-                if not is_vowel(word[index]):
-                    consonant_count += 1
-            index += 1
+                break
 
-    if consonant_count > 1:
-        set_consonant_cluster_size(consonant_count)
-        return True
-    return False
+    return consonant_cluster_size if consonant_cluster_size > 1 else 0
 
 
-# TODO: Implement quote handling
-def capture_quotes(word, start_index):
-    end_index = word.find('\"', start_index + 1)
+def handle_quotes(word):
+    prepend_quote = word.startswith('\"')
+    append_quote = word.endswith('\"')
     word = word.strip('\"')
-    if end_index != -1:
-        return word, end_index
-    return word
+    return word, prepend_quote, append_quote
 
 
 def process_word(word, suffix, prepend_quote=False, append_quote=False):
-    if prepend_quote and append_quote:
-        return "\"" + word + suffix + "\""
-    elif prepend_quote and not append_quote:
-        return "\"" + word + suffix
-    elif append_quote and not prepend_quote:
-        return word + suffix + "\""
-    else:
-        return word + suffix
+    if prepend_quote:
+        word = "\"" + word
+    if append_quote:
+        word += "\""
+    return word + suffix
 
 
 def get_pig_latin_word(word):
     """Format given word in pig latin, taking punctuation into account"""
 
-    # Preprocessing
+    word, prepend_quote, append_quote = handle_quotes(word)
 
-    # Handle double quotes
-    start_index = word.find('\"')
+    last_char = word[-1] if word[-1] in string.punctuation else ''
+    word = word[:-1] if last_char else word
 
-    append_quote = False
-    prepend_quote = False
+    first_char_upper = word[0].isupper()
+    word_upper = word.isupper()
 
-    if start_index != -1:
-        end_index = word.find('\"', start_index + 1)
-        if start_index == 0:
-            prepend_quote = True
-        if end_index != -1 or start_index == word.find(word[-1]):
-            append_quote = True
-        word = word.strip('\"')
-
-    # Set needed variables
-    last_char_in_word = word[-1]
-
-    # Boolean determinants
-    word_ends_with_punctuation = False
-    first_char_upper = False
-    word_upper = False
-
-    if last_char_in_word in string.punctuation:
-        word_ends_with_punctuation = True
-
-    if word[0].isupper() and not word.isupper():
-        first_char_upper = True
-
-    if word.isupper():
-        word_upper = True
-
-    # Data manipulation
-    pig_latin_word = ""
-    if word_ends_with_punctuation:
-        # If the word starts with a vowel and has punctuation, add 'way'
-        # and the punctuation to the end of the word.
-        if is_vowel(word[0]):
-            pig_latin_word = process_word(word[:-1].lower(),
-                                          f"way{last_char_in_word}", prepend_quote, append_quote)
-
-        elif starts_with_consonant_cluster(word):
-            pig_latin_word = process_word(word[consonant_cluster_size:-1].lower() +
-                                          word[0:consonant_cluster_size].lower(), f"ay{last_char_in_word}",
-                                          prepend_quote, append_quote)
-        else:
-            # Else add the first letter to the end and append 'ay' if it is a consonant
-            pig_latin_word = process_word(word[1:-1].lower() + word[0].lower(), f"ay{last_char_in_word}",
-                                          prepend_quote, append_quote)
+    if is_vowel(word[0], word):
+        pig_latin_word = word + "way"
     else:
-        if is_vowel(word[0]):
-            pig_latin_word = process_word(word.lower(), f"way", prepend_quote, append_quote)
-        elif starts_with_consonant_cluster(word):
-            pig_latin_word = process_word(word[consonant_cluster_size:].lower() +
-                                          word[0:consonant_cluster_size].lower(), f"ay",
-                                          prepend_quote, append_quote)
+        cluster_size = starts_with_consonant_cluster(word)
+        if cluster_size:
+            pig_latin_word = word[cluster_size:] + word[:cluster_size] + "ay"
         else:
-            # Else add the first letter to the end and append 'ay' if it is a consonant
-            pig_latin_word = process_word(word[1:].lower() + word[0].lower(), f"ay", prepend_quote, append_quote)
+            pig_latin_word = word[1:] + word[0] + "ay"
 
     if first_char_upper:
-        pig_latin_word = list(pig_latin_word)
-        pig_latin_word[0] = pig_latin_word[0].upper()
-        pig_latin_word = "".join(pig_latin_word)
+        pig_latin_word = pig_latin_word.capitalize()
 
-    elif word_upper:
+    if word_upper:
         pig_latin_word = pig_latin_word.upper()
 
-    return pig_latin_word
+    return process_word(pig_latin_word, last_char, prepend_quote, append_quote)
 
 
 def main():
