@@ -78,10 +78,7 @@ def main():
     while True:
         user_input = input("Please enter a word or phrase.\n")
 
-        # Split the string into a list
-        input_list = user_input.split()
-
-        result_text = ' '.join([get_pig_latin_word(w) for w in input_list])
+        result_text = ' '.join([get_pig_latin_word(word) for word in user_input.split()])
         print(textwrap.fill(result_text))
 
         pyperclip.copy(result_text)
