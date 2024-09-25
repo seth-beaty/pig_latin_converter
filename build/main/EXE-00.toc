@@ -103,7 +103,7 @@
  [],
  False,
  False,
- 1726702488,
+ 1727265489,
  [('run.exe',
    'C:\\Users\\callm\\PycharmProjects\\pig_latin_converter\\.venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
    'EXECUTABLE')],
